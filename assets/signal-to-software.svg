@@ -1,0 +1,88 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="126" viewBox="0 0 1200 126" role="img" aria-labelledby="title desc">
+  <title id="title">From physical systems to intelligent software</title>
+  <desc id="desc">An animated signal travels from a physical sensor through embedded processing into connected intelligent software.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#07111f"/>
+      <stop offset="0.62" stop-color="#081727"/>
+      <stop offset="1" stop-color="#0d1021"/>
+    </linearGradient>
+    <linearGradient id="type" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#eefaff"/>
+      <stop offset="0.48" stop-color="#eefaff"/>
+      <stop offset="0.58" stop-color="#67e8f9"/>
+      <stop offset="0.76" stop-color="#a78bfa"/>
+      <stop offset="1" stop-color="#fde68a"/>
+    </linearGradient>
+    <linearGradient id="flow" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#22d3ee" stop-opacity="0.2"/>
+      <stop offset="0.52" stop-color="#67e8f9"/>
+      <stop offset="0.8" stop-color="#a78bfa"/>
+      <stop offset="1" stop-color="#fde68a"/>
+    </linearGradient>
+    <filter id="glow" x="-200%" y="-200%" width="400%" height="400%">
+      <feGaussianBlur stdDeviation="4" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
+      <path d="M20 0H0V20" fill="none" stroke="#17344a" stroke-width="0.6" opacity="0.32"/>
+    </pattern>
+    <style>
+      text { font-family:"Segoe UI",Inter,Arial,sans-serif; }
+      .eyebrow { fill:#68dff5; font-size:11px; font-weight:700; letter-spacing:2.2px; }
+      .title { fill:url(#type); font-size:26px; font-weight:700; letter-spacing:0.3px; }
+      .node-label { fill:#7194aa; font-size:8px; font-weight:600; letter-spacing:1px; }
+    </style>
+  </defs>
+
+  <rect x="1" y="1" width="1198" height="124" rx="18" fill="url(#bg)" stroke="#1c3b50"/>
+  <rect x="1" y="1" width="1198" height="124" rx="18" fill="url(#grid)" opacity="0.45"/>
+  <path d="M24 98H1176" stroke="#153349" stroke-width="1"/>
+
+  <text x="38" y="37" class="eyebrow">MECHATRONICS × COMPUTING</text>
+  <text x="38" y="72" class="title">FROM PHYSICAL SYSTEMS TO INTELLIGENT SOFTWARE.</text>
+  <text x="39" y="99" fill="#86a7ba" font-size="12">Signal → firmware → inference → action → connected experience</text>
+
+  <g transform="translate(811 18)">
+    <path id="journey" d="M13 60C55 25 87 91 127 58S196 24 235 58S304 92 352 47" fill="none" stroke="url(#flow)" stroke-width="2.2" stroke-linecap="round" stroke-dasharray="7 8">
+      <animate attributeName="stroke-dashoffset" values="0;-90" dur="4.8s" repeatCount="indefinite"/>
+    </path>
+
+    <g transform="translate(13 60)">
+      <circle r="17" fill="#0b2134" stroke="#2a6b8d"/>
+      <path d="M-8 2C-4-8 0 12 5-1S12 2 14-4" fill="none" stroke="#67e8f9" stroke-width="2"/>
+      <text x="0" y="31" text-anchor="middle" class="node-label">SENSE</text>
+    </g>
+    <g transform="translate(127 58)">
+      <rect x="-17" y="-17" width="34" height="34" rx="8" fill="#0b2134" stroke="#38bdf8"/>
+      <path d="M-8-8H8V8H-8ZM-4-4H4V4H-4Z" fill="none" stroke="#67e8f9" stroke-width="1.5"/>
+      <text x="0" y="32" text-anchor="middle" class="node-label">PROCESS</text>
+    </g>
+    <g transform="translate(235 58)">
+      <circle r="18" fill="#121b38" stroke="#8b8cff"/>
+      <circle cx="-7" cy="-4" r="2.5" fill="#67e8f9"/>
+      <circle cx="7" cy="-7" r="2.5" fill="#a78bfa"/>
+      <circle cx="5" cy="8" r="2.5" fill="#fde68a"/>
+      <path d="M-7-4L7-7L5 8Z" fill="none" stroke="#b8c8ff"/>
+      <text x="0" y="33" text-anchor="middle" class="node-label">INFER</text>
+    </g>
+    <g transform="translate(352 47)">
+      <rect x="-22" y="-17" width="44" height="34" rx="7" fill="#171a31" stroke="#a78bfa"/>
+      <path d="M-13-7H13M-13 0H5M-13 7H10" stroke="#d8d7ff" stroke-width="2" stroke-linecap="round"/>
+      <circle cx="15" cy="7" r="2.5" fill="#fde68a"/>
+      <text x="0" y="33" text-anchor="middle" class="node-label">DELIVER</text>
+    </g>
+
+    <circle r="5" fill="#ffffff" filter="url(#glow)">
+      <animateMotion dur="5.8s" repeatCount="indefinite" path="M13 60C55 25 87 91 127 58S196 24 235 58S304 92 352 47"/>
+    </circle>
+    <circle r="2.5" fill="#fde68a">
+      <animateMotion dur="5.8s" begin="-1.9s" repeatCount="indefinite" path="M13 60C55 25 87 91 127 58S196 24 235 58S304 92 352 47"/>
+    </circle>
+
+    <circle cx="352" cy="47" r="24" fill="none" stroke="#fde68a" opacity="0">
+      <animate attributeName="r" values="19;31" dur="2.4s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0.6;0" dur="2.4s" repeatCount="indefinite"/>
+    </circle>
+  </g>
+</svg>

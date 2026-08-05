@@ -8,7 +8,9 @@
   <a href="https://www.linkedin.com/in/khairulfawwaz"><img src="https://img.shields.io/badge/CONNECT-LINKEDIN-66e3cf?style=for-the-badge&labelColor=07111f" alt="Connect with Khairul Fawwaz on LinkedIn"></a>
 </p>
 
-### From physical systems to intelligent software.
+<p align="center">
+  <img src="assets/signal-to-software.svg" width="100%" alt="From physical systems to intelligent software: an animated signal journey from sensing through processing and inference to delivery">
+</p>
 
 I'm a **Mechatronic Engineering graduate from Universiti Sains Malaysia (USM)** who builds where hardware, software, and intelligence meet. My work moves between real-time firmware, signal processing, on-device machine learning, connected devices, automation, and native application development.
 
@@ -143,3 +145,11 @@ I'm open to graduate and entry-level opportunities across embedded systems, Edge
 </p>
 
 <sub>Sense precisely. Decide locally. Build reliably.</sub>
+
+<br>
+
+---
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/KhaiFaw/KhaiFaw/activity-output/activity-constellation.svg" width="100%" alt="KhaiFaw activity constellation: an animated public GitHub contribution calendar">
+</p>
