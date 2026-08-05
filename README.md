@@ -1,32 +1,33 @@
 <p align="center">
-  <img src="assets/profile-banner.svg" width="100%" alt="Khairul Fawwaz — Embedded Systems, Edge AI and Automation">
+  <img src="assets/portfolio-constellation.gif" width="100%" alt="Animated engineering constellation representing embedded systems, Edge AI, automation, IoT, and software">
 </p>
 
 <p align="center">
-  <a href="https://github.com/KhaiFaw/ai-acoustic-event-detection"><img src="https://img.shields.io/badge/FEATURED_PROJECT-ACOUSTIC_EDGE_AI-2dd4bf?style=for-the-badge&labelColor=07111f" alt="Featured project: Acoustic Edge AI"></a>
-  <a href="https://www.linkedin.com/in/khairulfawwaz"><img src="https://img.shields.io/badge/LINKEDIN-LET'S_CONNECT-38bdf8?style=for-the-badge&labelColor=07111f" alt="Connect on LinkedIn"></a>
+  <a href="https://github.com/KhaiFaw/ai-acoustic-event-detection"><img src="https://img.shields.io/badge/EXPLORE-EMBEDDED_EDGE_AI-52dcff?style=for-the-badge&labelColor=07111f" alt="Explore the embedded Edge AI project"></a>
+  <a href="https://github.com/KhaiFaw/mybudget-windows"><img src="https://img.shields.io/badge/EXPLORE-MYBUDGET_WINDOWS-8b8cff?style=for-the-badge&labelColor=07111f" alt="Explore the MyBudget Windows app"></a>
+  <a href="https://www.linkedin.com/in/khairulfawwaz"><img src="https://img.shields.io/badge/CONNECT-LINKEDIN-66e3cf?style=for-the-badge&labelColor=07111f" alt="Connect with Khairul Fawwaz on LinkedIn"></a>
 </p>
 
-### Engineering reliable intelligence at the edge.
+### From physical systems to intelligent software.
 
-I'm a **Mechatronic Engineering graduate from Universiti Sains Malaysia (USM)** focused on embedded software, signal processing, Edge AI, and automation. I enjoy the point where hardware meets intelligence: capturing real-world signals, turning them into useful features, deploying compact models, and making the complete system behave reliably in real time.
+I'm a **Mechatronic Engineering graduate from Universiti Sains Malaysia (USM)** who builds where hardware, software, and intelligence meet. My work moves between real-time firmware, signal processing, on-device machine learning, connected devices, automation, and native application development.
 
-My work spans **embedded C/C++**, RTOS-based firmware, sensor integration, TinyML, IoT connectivity, and hardware–software debugging. Here, I document the systems I build and the engineering lessons behind them.
+I care about the full engineering path: understanding the physical signal, choosing a practical architecture, working within real constraints, and leaving behind a system that can be tested, explained, and improved.
 
 ---
 
-## Featured engineering work
+## Selected work
 
 <table>
   <tr>
-    <td width="58%" valign="top">
-      <h3>AI-Powered Acoustic Event Detection</h3>
-      <p>An embedded Edge AI system that classifies six domestic sound categories directly on a <strong>Renesas RA8P1 Titan Board</strong>—without cloud inference.</p>
-      <p>The firmware captures microphone audio, extracts MFCC, delta, and delta-delta features, runs an INT8 convolutional neural network with TensorFlow Lite for Microcontrollers, and produces confidence-gated real-time alerts.</p>
+    <td width="56%" valign="top">
+      <h3>01 / On-device acoustic intelligence</h3>
+      <p>A complete embedded Edge AI pipeline that recognizes six domestic sound categories directly on a <strong>Renesas RA8P1 Titan Board</strong>—without cloud inference.</p>
+      <p>The firmware captures microphone audio, extracts MFCC, delta, and delta-delta features, runs an INT8 convolutional neural network through TensorFlow Lite for Microcontrollers, and produces confidence-gated alerts in real time.</p>
       <p><code>Embedded C/C++</code> <code>RT-Thread</code> <code>CMSIS-DSP</code> <code>TinyML</code> <code>TFLM</code></p>
       <p><a href="https://github.com/KhaiFaw/ai-acoustic-event-detection"><strong>Explore the firmware and technical breakdown →</strong></a></p>
     </td>
-    <td width="42%" align="center" valign="middle">
+    <td width="44%" align="center" valign="middle">
       <a href="https://github.com/KhaiFaw/ai-acoustic-event-detection">
         <img src="https://raw.githubusercontent.com/KhaiFaw/ai-acoustic-event-detection/main/docs/images/system-pipeline.png" width="100%" alt="Acoustic event detection system pipeline">
       </a>
@@ -34,81 +35,111 @@ My work spans **embedded C/C++**, RTOS-based firmware, sensor integration, TinyM
   </tr>
 </table>
 
-| On-device classes | Feature pipeline | Model footprint | Evaluation |
+| Sound classes | Feature pipeline | Model footprint | Board-recorded evaluation |
 |:---:|:---:|:---:|:---:|
-| **6** sound categories | **39 × 61** MFCC-derived features | **114.4 KB** INT8 model | **87.5%** on a small board-recorded test split |
+| **6** | **39 × 61** MFCC-derived features | **114.4 KB** INT8 model | **87.5%** on a small test split |
 
-> The project demonstrates the full embedded ML path: data capture, DSP, model deployment, memory-aware inference, confidence handling, and live device output.
+<br>
+
+<table>
+  <tr>
+    <td width="44%" align="center" valign="middle">
+      <a href="https://github.com/KhaiFaw/mybudget-windows">
+        <img src="https://raw.githubusercontent.com/KhaiFaw/mybudget-windows/main/docs/screenshots/mybudget-dashboard-light.png" width="100%" alt="MyBudget Windows dashboard">
+      </a>
+    </td>
+    <td width="56%" valign="top">
+      <h3>02 / Local-first Windows software</h3>
+      <p><strong>MyBudget</strong> is a native Windows monthly budget planner designed around private, PC-local data. It handles planning, transactions, recurring income and bills, savings goals, investments, reporting, backup, and CSV exchange.</p>
+      <p>The codebase separates UI, budget rules, and persistence; uses exact decimal money calculations; and includes data-preserving SQLite migrations plus automated verification.</p>
+      <p><code>C# 14</code> <code>.NET 10</code> <code>WinUI 3</code> <code>MVVM</code> <code>SQLite</code></p>
+      <p><a href="https://github.com/KhaiFaw/mybudget-windows"><strong>See the architecture, screenshots, and verified build →</strong></a></p>
+    </td>
+  </tr>
+</table>
+
+| Native screens | Automated tests | Data model | Cloud dependency |
+|:---:|:---:|:---:|:---:|
+| **8** | **105** | Local SQLite | **None** |
 
 ---
 
-## Engineering toolkit
+## Engineering range
 
-| Area | Technologies and capabilities |
+| Domain | What I build with |
 |---|---|
 | **Embedded systems** | C, C++, microcontrollers, RTOS concepts, firmware architecture, peripheral and sensor integration |
-| **Edge AI & DSP** | TensorFlow Lite Micro, TinyML, CNNs, MFCC feature extraction, CMSIS-DSP, quantized inference |
-| **Connectivity** | MQTT, UART, LTE AT commands, Wi-Fi, OTA update workflows |
-| **Automation** | PLC Ladder Logic, control systems, MATLAB/Simulink |
-| **Development** | RT-Thread Studio, VS Code, Keil µVision, Git/GitHub, Python |
+| **Edge AI & signal processing** | TensorFlow Lite Micro, TinyML, CNNs, MFCC feature extraction, CMSIS-DSP, quantized inference |
+| **Automation & control** | PLC Ladder Logic, control systems, MATLAB, Simulink |
+| **Connected devices** | MQTT, UART, LTE AT commands, Wi-Fi, OTA update workflows |
+| **Application software** | C#, .NET, WinUI 3, XAML, MVVM, SQLite, Python |
 
 <p>
-  <img src="https://img.shields.io/badge/C-Embedded_firmware-2dd4bf?style=flat-square&labelColor=07111f" alt="C">
+  <img src="https://img.shields.io/badge/C-Embedded_firmware-52dcff?style=flat-square&labelColor=07111f" alt="C">
   <img src="https://img.shields.io/badge/C%2B%2B-Real--time_systems-38bdf8?style=flat-square&labelColor=07111f" alt="C++">
+  <img src="https://img.shields.io/badge/C%23-Native_Windows-8b8cff?style=flat-square&labelColor=07111f" alt="C sharp">
   <img src="https://img.shields.io/badge/RTOS-RT--Thread-0ea5e9?style=flat-square&labelColor=07111f" alt="RT-Thread">
   <img src="https://img.shields.io/badge/TinyML-On--device_AI-818cf8?style=flat-square&labelColor=07111f" alt="TinyML">
   <img src="https://img.shields.io/badge/DSP-MFCC_%2B_CMSIS-6366f1?style=flat-square&labelColor=07111f" alt="Digital signal processing">
-  <img src="https://img.shields.io/badge/IoT-MQTT_%2B_LTE-f59e0b?style=flat-square&labelColor=07111f" alt="IoT connectivity">
+  <img src="https://img.shields.io/badge/IoT-MQTT_%2B_LTE-66e3cf?style=flat-square&labelColor=07111f" alt="IoT connectivity">
+  <img src="https://img.shields.io/badge/.NET-WinUI_3-9b8cff?style=flat-square&labelColor=07111f" alt=".NET and WinUI 3">
 </p>
 
 ---
 
-## Experience
+## Experience & foundation
 
-### Embedded Systems Intern · Innowave LLC
+<table>
+  <tr>
+    <td width="50%" valign="top">
+      <h3>Embedded Systems Intern</h3>
+      <p><strong>Innowave LLC</strong></p>
+      <ul>
+        <li>Developed and optimized microcontroller-based embedded systems.</li>
+        <li>Integrated sensors and supported hardware–firmware debugging.</li>
+        <li>Worked with MQTT, LTE communication, and OTA update workflows.</li>
+        <li>Connected physical devices to dependable software services.</li>
+      </ul>
+    </td>
+    <td width="50%" valign="top">
+      <h3>Bachelor of Mechatronic Engineering</h3>
+      <p><strong>Universiti Sains Malaysia</strong></p>
+      <p>A multidisciplinary foundation across electronics, embedded programming, control, automation, mechanical systems, and intelligent system design.</p>
+      <p>That mix still shapes how I work: system-first, evidence-led, and comfortable crossing hardware–software boundaries.</p>
+    </td>
+  </tr>
+</table>
 
-- Developed and optimized microcontroller-based embedded systems.
-- Integrated sensors and supported hardware–firmware debugging.
-- Worked with MQTT, LTE communication, and OTA update workflows.
-- Built practical experience connecting physical devices to reliable software services.
+### Earlier engineering builds
 
-### Bachelor of Mechatronic Engineering · Universiti Sains Malaysia
-
-A multidisciplinary foundation spanning electronics, embedded programming, control, automation, mechanical systems, and intelligent system design.
-
----
-
-## Other engineering work
-
-| Project | Engineering focus |
+| System | Engineering focus |
 |---|---|
-| **Legged line-following robot** | Arduino-based sensing, locomotion, and closed-loop path following |
+| **Legged line-following robot** | Arduino sensing, locomotion, and closed-loop path following |
 | **Hand-hygiene monitoring system** | PLC-controlled automation and process monitoring |
 | **Height-measurement device** | RISC-V and 8052 embedded implementation |
 | **FPGA passcode alarm** | Digital logic, state-based control, and hardware implementation |
-| **Personal contact directory** | C++ file-based CRUD application and structured data handling |
-
-These projects are being cleaned up and documented for future public releases.
 
 ---
 
-## What I'm working toward
+## Current trajectory
 
 - Building production-minded embedded and Edge AI systems.
-- Improving real-time firmware architecture, testing, and documentation.
-- Publishing more engineering projects and technical write-ups.
-- Exploring graduate and entry-level opportunities in embedded systems, Edge AI, automation, and related engineering roles.
+- Strengthening real-time firmware architecture, testing, and documentation.
+- Expanding into well-structured application software and AI-assisted engineering workflows.
+- Publishing project evidence—not just finished screenshots, but architecture, constraints, verification, and lessons learned.
 
 ---
 
-## Let's connect
+## Connect
 
-If you're working on embedded intelligence, real-time firmware, IoT, or automation, I'd be glad to connect.
+I'm open to graduate and entry-level opportunities across embedded systems, Edge AI, automation, IoT, and adjacent software engineering.
 
 <p>
+  <a href="mailto:khairulfaw@gmail.com"><strong>Email</strong></a>
+  &nbsp;·&nbsp;
   <a href="https://www.linkedin.com/in/khairulfawwaz"><strong>LinkedIn</strong></a>
   &nbsp;·&nbsp;
-  <a href="https://github.com/KhaiFaw/ai-acoustic-event-detection"><strong>Featured project</strong></a>
+  <a href="https://github.com/KhaiFaw?tab=repositories"><strong>Repositories</strong></a>
 </p>
 
-<sub>Building systems that sense, decide, and act.</sub>
+<sub>Sense precisely. Decide locally. Build reliably.</sub>
