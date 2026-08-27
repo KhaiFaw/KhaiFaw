@@ -24,25 +24,25 @@ I care about the full engineering path: understanding the physical signal or pro
   <tr>
     <td width="62%" valign="top">
       <h3>PC Platform Validation Toolkit</h3>
-      <p>A requirements-based command-line toolkit for collecting privacy-conscious PC inventory and running bounded, reproducible validation workloads.</p>
-      <p>The current build covers sanitized platform fingerprints, explicit capability discovery, CPU, memory, and temporary-storage workloads, independent telemetry sampling, requirement evaluation, versioned YAML plans, transactional SQLite storage, and canonical JSON evidence.</p>
+      <p>A requirements-based command-line toolkit that turns a validation plan into bounded workloads, privacy-conscious inventory, immutable evidence, readable reports, and compatibility-gated regression comparisons.</p>
+      <p>The portfolio MVP now covers the full workflow: capability discovery, CPU, memory, and temporary-storage validation, telemetry, explicit requirement evaluation, SQLite persistence, JSON/Markdown/HTML reports, known-good baselines, conservative comparison policies, and a clearly labelled fault-injection demonstration.</p>
       <p><code>Python 3.12</code> <code>C++20</code> <code>Typer</code> <code>Pydantic</code> <code>psutil</code> <code>SQLite</code> <code>pytest</code></p>
       <p><a href="https://github.com/KhaiFaw/pc-platform-validation-toolkit"><strong>Follow the implementation and engineering decisions →</strong></a></p>
     </td>
     <td width="38%" valign="top">
       <h4>Build state</h4>
-      <p><strong>Milestones 0–6 complete</strong></p>
-      <p>✓ 59 automated tests passing<br>
-      ✓ Bounded execution and cleanup<br>
-      ✓ Local SQLite run history<br>
-      ✓ Canonical JSON evidence<br>
-      ◌ Reports and baselines next</p>
-      <p><sub>Active development · pre-alpha</sub></p>
+      <p><strong>Portfolio MVP implemented</strong></p>
+      <p>✓ 66 automated tests passing<br>
+      ✓ Windows + Ubuntu CI passing<br>
+      ✓ Immutable evidence and reports<br>
+      ✓ Baselines and regression analysis<br>
+      ✓ Safe synthetic failure path</p>
+      <p><sub>Active development · 0.1.0.dev0</sub></p>
     </td>
   </tr>
 </table>
 
-> The native CPUID probe source and its decoder tests are present. Compiling it on the development machine awaits a CMake/C++20 toolchain, so native-probe execution is not presented as verified yet.
+> The original development machine still lacks the optional CMake/C++20 toolchain. The native decoder is instead built and tested by the passing GitHub Actions matrix on both Windows and Ubuntu; unavailable local capabilities remain explicit WARN or SKIP evidence.
 
 ---
 
@@ -124,7 +124,7 @@ I care about the full engineering path: understanding the physical signal or pro
 | **Embedded systems** | C, C++, microcontrollers, RTOS concepts, firmware architecture, peripheral and sensor integration |
 | **Edge AI & signal processing** | TensorFlow Lite Micro, TinyML, CNNs, MFCC feature extraction, CMSIS-DSP, quantized inference |
 | **Manufacturing analytics** | PostgreSQL, advanced SQL, Power BI, data modeling, quality validation, yield and failure analysis |
-| **Platform validation** | Python, C++20, bounded workloads, telemetry, requirements evaluation, SQLite evidence, pytest |
+| **Platform validation** | Python, C++20, bounded workloads, telemetry, requirements evaluation, immutable reports, regression baselines, cross-platform CI |
 | **Automation & control** | PLC Ladder Logic, control systems, MATLAB, Simulink |
 | **Connected devices** | MQTT, UART, LTE AT commands, Wi-Fi, OTA update workflows |
 | **Application software** | C#, .NET, WinUI 3, XAML, MVVM, SQLite, Python |
@@ -142,7 +142,7 @@ I care about the full engineering path: understanding the physical signal or pro
   <img src="https://img.shields.io/badge/IoT-MQTT_%2B_LTE-66e3cf?style=flat-square&labelColor=07111f" alt="IoT connectivity">
   <img src="https://img.shields.io/badge/.NET-WinUI_3-9b8cff?style=flat-square&labelColor=07111f" alt=".NET and WinUI 3">
   <img src="https://img.shields.io/badge/Python-Validation_tooling-3776ab?style=flat-square&labelColor=07111f" alt="Python validation tooling">
-  <img src="https://img.shields.io/badge/pytest-59_tests_passing-0a9edc?style=flat-square&labelColor=07111f" alt="pytest automated verification">
+  <img src="https://img.shields.io/badge/pytest-66_tests_passing-0a9edc?style=flat-square&labelColor=07111f" alt="pytest automated verification">
   <img src="https://img.shields.io/badge/SQLite-Local_evidence-5b8fa8?style=flat-square&labelColor=07111f" alt="SQLite local evidence storage">
 </p>
 
@@ -184,7 +184,7 @@ I care about the full engineering path: understanding the physical signal or pro
 
 ## Current trajectory
 
-- Developing a bounded PC platform validation toolkit with reproducible plans, telemetry, and local evidence persistence.
+- Extending a verified PC platform validation MVP with reproducible plans, immutable evidence, offline reports, and regression baselines.
 - Building production-minded embedded and Edge AI systems.
 - Applying SQL and Power BI to manufacturing yield, failure, and process data.
 - Strengthening real-time firmware architecture, testing, and documentation.
