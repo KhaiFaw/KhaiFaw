@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="520" height="480" viewBox="0 0 520 480" role="img" aria-labelledby="title desc">
+  <title id="title">Acoustic intelligence — from sound to a local decision</title>
+  <desc id="desc">Animated schematic of the FYP: microphone input, MFCC features, INT8 inference and confidence-gated alerts. Motion illustrates the architecture, not a live measurement.</desc>
+  <defs>
+    <linearGradient id="bg" x2="1" y2="1"><stop stop-color="#07111f"/><stop offset="1" stop-color="#10132b"/></linearGradient>
+    <linearGradient id="flow"><stop stop-color="#52dcff"/><stop offset=".6" stop-color="#a78bfa"/><stop offset="1" stop-color="#66e3cf"/></linearGradient>
+    <pattern id="grid" width="24" height="24" patternUnits="userSpaceOnUse"><path d="M24 0H0V24" fill="none" stroke="#203550" stroke-width=".5"/></pattern>
+    <filter id="glow"><feGaussianBlur stdDeviation="3"/></filter>
+    <style>text{font-family:'Segoe UI',Arial,sans-serif}.label{font-size:12px;font-weight:700;letter-spacing:2px;fill:#79dff8}.body{font-size:15px;fill:#d8e8f3}.small{font-size:11px;fill:#8daac0}.route{stroke-dasharray:6 8;animation:travel 5s linear infinite}@keyframes travel{to{stroke-dashoffset:-140}}@media(prefers-reduced-motion:reduce){.route{animation:none}}</style>
+  </defs>
+  <rect x="1" y="1" width="518" height="478" rx="18" fill="url(#bg)" stroke="#234258"/>
+  <rect x="2" y="2" width="516" height="476" rx="18" fill="url(#grid)" opacity=".4"/>
+  <text x="30" y="37" class="label">01 / ACOUSTIC INTELLIGENCE</text>
+  <text x="30" y="65" fill="#f0f8ff" font-family="Segoe UI,Arial,sans-serif" font-size="23" font-weight="700">A signal becomes a decision.</text>
+  <path d="M76 127V372" stroke="#1c3d58" stroke-width="2"/>
+  <path d="M76 127V372" stroke="url(#flow)" stroke-width="2" class="route"/>
+  <g>
+    <circle cx="76" cy="127" r="28" fill="#0c2235" stroke="#52dcff"/>
+    <path d="M56 127H61L66 116L72 140L78 110L84 136L90 127H96" fill="none" stroke="#70eaff" stroke-width="2"/>
+    <circle cx="76" cy="127" r="28" fill="none" stroke="#52dcff" opacity=".3"><animate attributeName="r" values="28;39;28" dur="4s" repeatCount="indefinite"/><animate attributeName="opacity" values=".3;0;.3" dur="4s" repeatCount="indefinite"/></circle>
+    <text x="127" y="123" class="label">CAPTURE</text><text x="127" y="147" class="body">Microphone → RA8P1</text>
+  </g>
+  <g>
+    <rect x="49" y="182" width="54" height="54" rx="13" fill="#0e2038" stroke="#69bafa"/>
+    <path d="M60 197H67V204H60ZM72 197H79V204H72ZM84 197H91V204H84ZM60 209H67V216H60ZM72 209H79V216H72ZM84 209H91V216H84ZM60 221H67V228H60ZM72 221H79V228H72ZM84 221H91V228H84Z" fill="#52dcff" opacity=".65"><animate attributeName="opacity" values=".4;.9;.4" dur="4s" begin="-1s" repeatCount="indefinite"/></path>
+    <text x="127" y="205" class="label">EXTRACT</text><text x="127" y="229" class="body">MFCC + Δ + ΔΔ · 39 × 61</text>
+  </g>
+  <g>
+    <circle cx="76" cy="291" r="28" fill="#191d3c" stroke="#a78bfa"/>
+    <path d="M63 281L86 278L82 306L63 281L89 295L86 278M63 281L60 300L82 306" fill="none" stroke="#b3a0fa"/>
+    <g fill="#dbd0ff"><circle cx="63" cy="281" r="3"/><circle cx="86" cy="278" r="3"/><circle cx="82" cy="306" r="3"/><circle cx="89" cy="295" r="3"/><circle cx="60" cy="300" r="3"/></g>
+    <text x="127" y="287" class="label">INFER</text><text x="127" y="311" class="body">INT8 CNN · six sound classes</text>
+  </g>
+  <g>
+    <rect x="49" y="346" width="54" height="54" rx="13" fill="#0e2933" stroke="#66e3cf"/>
+    <path d="M63 373L72 382L89 363" fill="none" stroke="#8af6df" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="127" y="369" class="label">RESPOND</text><text x="127" y="393" class="body">Confidence-gated local alerts</text>
+  </g>
+  <circle r="4" fill="#f6fcff"><animateMotion path="M76 127V372" dur="5s" repeatCount="indefinite"/></circle>
+  <path d="M30 431H490" stroke="#234258"/>
+  <circle cx="35" cy="452" r="3" fill="#66e3cf"/>
+  <text x="47" y="456" class="small">ON-DEVICE INFERENCE</text><text x="490" y="456" text-anchor="end" class="small">ARCHITECTURE / NOT LIVE DATA</text>
+</svg>
