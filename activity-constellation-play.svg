@@ -46,7 +46,7 @@
         .animated-grid, .orbital-motion { display:none; }
         .static-grid { display:inline; }
       }
-      
+      .static-grid { display:none; } .animated-grid, .orbital-motion { display:inline; }
     </style>
   </defs>
 
