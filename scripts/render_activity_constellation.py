@@ -5,7 +5,6 @@ from __future__ import annotations
 
 import argparse
 import html
-import math
 import re
 import urllib.request
 from datetime import date, timedelta
@@ -20,14 +19,13 @@ CELL = 11
 GAP = 5
 WEEKS = 53
 DAYS = 7
-SIGNAL_DURATION = 8.4
 
 LEVEL_COLORS = {
     0: "#111c2b",
-    1: "#164e63",
-    2: "#0891b2",
-    3: "#38bdf8",
-    4: "#a78bfa",
+    1: "#22637b",
+    2: "#4b93a5",
+    3: "#79c6d2",
+    4: "#c9fbff",
 }
 
 
@@ -92,11 +90,33 @@ def esc(value: object) -> str:
     return html.escape(str(value), quote=True)
 
 
+def contribution_light(count: int, maximum: int) -> tuple[str, float]:
+    """Count-based, monotonically brighter RGB and halo strength; zero stays dark."""
+    if count <= 0:
+        return LEVEL_COLORS[0], 0.0
+    strength = count / max(maximum, count)
+    low, high = (24, 83, 110), (201, 251, 255)
+    rgb = tuple(round(a + (b - a) * strength) for a, b in zip(low, high))
+    return '#' + ''.join(f'{value:02x}' for value in rgb), 0.12 + 0.78 * strength
+
+
+def scan_timeline(days: list[tuple[date, int, int]]) -> tuple[list[float], float, float]:
+    """Visit every date chronologically, slowing down on contribution days."""
+    active = sum(count > 0 for _, count, _ in days)
+    dwell = min(0.55, 18.0 / max(active, 1))
+    elapsed = 0.35
+    arrivals = []
+    for _, count, _ in days:
+        arrivals.append(elapsed)
+        elapsed += dwell if count else 0.014
+    fade_start = elapsed + 2.4  # Hold the completed constellation before resetting.
+    return arrivals, fade_start, fade_start + 0.8
+
+
 def render(username: str, today: date, activity: dict[date, tuple[int, int]]) -> str:
     sunday_offset = (today.weekday() + 1) % 7
     current_week = today - timedelta(days=sunday_offset)
     start = current_week - timedelta(weeks=WEEKS - 1)
-    end = current_week + timedelta(days=6)
 
     days: list[tuple[date, int, int]] = []
     for offset in range((today - start).days + 1):
@@ -117,77 +137,66 @@ def render(username: str, today: date, activity: dict[date, tuple[int, int]]) ->
             month_labels.append((column, probe.strftime("%b").upper()))
             last_month = probe.month
 
-    column_rows: dict[int, list[int]] = {}
-    active_positions: list[tuple[int, int, int, int]] = []
+    maximum = max((count for _, count, _ in days), default=0)
+    arrivals, fade_start, duration = scan_timeline(days)
+    dark = LEVEL_COLORS[0]
     cells: list[str] = []
+    static_cells: list[str] = []
+    halos: list[str] = []
     for column in range(WEEKS):
         for row in range(DAYS):
             day = start + timedelta(weeks=column, days=row)
             count, level = activity.get(day, (0, 0)) if day <= today else (0, 0)
             x = GRID_X + column * (CELL + GAP)
             y = GRID_Y + row * (CELL + GAP)
-            color = LEVEL_COLORS[level]
-            opacity = 0.92 if level else 0.72
+            color, strength = contribution_light(count, maximum)
             label = f"{count} contribution{'s' if count != 1 else ''} on {day.isoformat()}"
             animation = ""
             if count:
-                column_rows.setdefault(column, []).append(row)
-                active_positions.append((column, row, count, level))
-                delay = column / WEEKS * SIGNAL_DURATION
-                peak = "#f8fdff" if level < 4 else "#fde68a"
+                arrival = arrivals[column * DAYS + row]
+                times = ';'.join(f'{t / duration:.6f}' for t in
+                                 (0, arrival, arrival + 0.04, fade_start, duration))
                 animation = (
-                    f'<animate attributeName="fill" values="{color};{color};{peak};{color};{color}" '
-                    f'keyTimes="0;0.38;0.48;0.61;1" dur="{SIGNAL_DURATION}s" '
-                    f'begin="{delay:.2f}s" repeatCount="indefinite"/>'
-                    f'<animate attributeName="opacity" values="{opacity};{opacity};1;{opacity};{opacity}" '
-                    f'keyTimes="0;0.38;0.48;0.61;1" dur="{SIGNAL_DURATION}s" '
-                    f'begin="{delay:.2f}s" repeatCount="indefinite"/>'
+                    f'<animate attributeName="fill" values="{dark};{dark};{color};{color};{dark}" '
+                    f'keyTimes="{times}" dur="{duration:.6f}s" repeatCount="indefinite"/>'
+                )
+                halos.append(
+                    f'<rect x="{x - 2}" y="{y - 2}" width="{CELL + 4}" height="{CELL + 4}" '
+                    f'rx="4" fill="{color}" filter="url(#glow)" opacity="0">'
+                    f'<animate attributeName="opacity" values="0;0;{strength:.6f};{strength:.6f};0" '
+                    f'keyTimes="{times}" dur="{duration:.6f}s" repeatCount="indefinite"/></rect>'
                 )
             cells.append(
                 f'<g><title>{esc(label)}</title>'
-                f'<rect x="{x}" y="{y}" width="{CELL}" height="{CELL}" rx="3" '
-                f'fill="{color}" opacity="{opacity}">{animation}</rect></g>'
+                f'<rect data-date="{day}" data-count="{count}" x="{x}" y="{y}" '
+                f'width="{CELL}" height="{CELL}" rx="2" fill="{dark}">{animation}</rect></g>'
+            )
+            static_cells.append(
+                f'<rect x="{x}" y="{y}" width="{CELL}" height="{CELL}" rx="2" fill="{color}"/>'
             )
 
-    signal_points: list[tuple[float, float]] = []
-    for column in range(WEEKS):
-        if column in column_rows:
-            row = sum(column_rows[column]) / len(column_rows[column])
-        else:
-            row = 3 + math.sin(column * 0.58) * 1.7
-        x = GRID_X + column * (CELL + GAP) + CELL / 2
-        y = GRID_Y + row * (CELL + GAP) + CELL / 2
-        signal_points.append((x, y))
-    signal_path = "M " + " L ".join(f"{x:.1f},{y:.1f}" for x, y in signal_points)
-
-    ripples: list[str] = []
-    ranked = sorted(active_positions, key=lambda item: (item[2], item[0]), reverse=True)[:12]
-    for index, (column, row, _, level) in enumerate(ranked):
-        cx = GRID_X + column * (CELL + GAP) + CELL / 2
-        cy = GRID_Y + row * (CELL + GAP) + CELL / 2
-        delay = (column / WEEKS * SIGNAL_DURATION + index * 0.11) % SIGNAL_DURATION
-        color = "#fde68a" if level == 4 else "#67e8f9"
-        ripples.append(
-            f'<circle cx="{cx:.1f}" cy="{cy:.1f}" r="5" fill="none" stroke="{color}" '
-            f'stroke-width="1" opacity="0">'
-            f'<animate attributeName="r" values="5;15;20" dur="{SIGNAL_DURATION}s" '
-            f'begin="{delay:.2f}s" repeatCount="indefinite"/>'
-            f'<animate attributeName="opacity" values="0;0.8;0" dur="{SIGNAL_DURATION}s" '
-            f'begin="{delay:.2f}s" repeatCount="indefinite"/>'
-            f'</circle>'
-        )
+    # One subtle outline visits individual cells, not weekly column averages.
+    positions = [(GRID_X + (i // DAYS) * (CELL + GAP) - 2,
+                  GRID_Y + (i % DAYS) * (CELL + GAP) - 2) for i in range(len(days))]
+    cursor_times = ';'.join(f'{t / duration:.6f}' for t in [0, *arrivals, duration])
+    cursor_positions = [positions[0], *positions, positions[-1]]
+    cursor_x = ';'.join(str(x) for x, _ in cursor_positions)
+    cursor_y = ';'.join(str(y) for _, y in cursor_positions)
 
     labels = "".join(
         f'<text x="{GRID_X + column * (CELL + GAP)}" y="{GRID_Y - 17}" class="month">{label}</text>'
-        for column, label in month_labels
+        for index, (column, label) in enumerate(month_labels)
         if GRID_X + column * (CELL + GAP) < 910
+        and (index + 1 == len(month_labels) or month_labels[index + 1][0] - column >= 3)
     )
 
     current_text = f"{current} day{'s' if current != 1 else ''}" if current else "ready"
     title = f"{username.upper()} / ACTIVITY CONSTELLATION"
     description = (
         f"Animated public contribution calendar for {username}: {total} contributions, "
-        f"{active_days} active days, longest streak {longest} days."
+        f"{active_days} active days, longest streak {longest} days. "
+        "Days are visited in chronological order; only contribution days light up. "
+        "More contributions produce brighter cubes. The completed grid holds, then resets."
     )
 
     return f"""<svg xmlns="http://www.w3.org/2000/svg" width="{WIDTH}" height="{HEIGHT}" viewBox="0 0 {WIDTH} {HEIGHT}" role="img" aria-labelledby="title desc">
@@ -233,6 +242,11 @@ def render(username: str, today: date, activity: dict[date, tuple[int, int]]) ->
       .metric-label {{ fill:#6f91a7; font-size:9px; font-weight:600; letter-spacing:1.1px; }}
       .footer {{ fill:#9bb7c8; font-size:12px; }}
       .mono {{ fill:#5b7f97; font-family: Consolas, monospace; font-size:9px; letter-spacing:1px; }}
+      .static-grid {{ display:none; }}
+      @media (prefers-reduced-motion: reduce) {{
+        .animated-grid, .orbital-motion {{ display:none; }}
+        .static-grid {{ display:inline; }}
+      }}
     </style>
   </defs>
 
@@ -248,7 +262,7 @@ def render(username: str, today: date, activity: dict[date, tuple[int, int]]) ->
   <text x="103" y="43" class="eyebrow">{esc(username.upper())} / PUBLIC BUILD SIGNAL</text>
   <text x="103" y="65" class="headline">ACTIVITY CONSTELLATION</text>
 
-  <g transform="translate(913 28)">
+  <g transform="translate(870 28)">
     <text x="0" y="19" class="metric">{total}</text>
     <text x="0" y="36" class="metric-label">CONTRIBUTIONS</text>
     <path d="M88 2V42" stroke="#1a3c54"/>
@@ -260,25 +274,19 @@ def render(username: str, today: date, activity: dict[date, tuple[int, int]]) ->
   </g>
 
   {labels}
-  <rect x="-70" y="{GRID_Y - 12}" width="70" height="{DAYS * (CELL + GAP) + 8}" fill="url(#scan)">
-    <animate attributeName="x" values="-70;930" dur="{SIGNAL_DURATION}s" repeatCount="indefinite"/>
-  </rect>
+  <g class="static-grid">{"".join(static_cells)}</g>
+  <g class="animated-grid">
+    {"".join(halos)}
+    {"".join(cells)}
+    <rect id="day-cursor" x="{positions[0][0]}" y="{positions[0][1]}" width="{CELL + 4}" height="{CELL + 4}"
+          rx="3" fill="none" stroke="#68899e" stroke-width="0.8" opacity="0.65">
+      <animate attributeName="x" values="{cursor_x}" keyTimes="{cursor_times}" calcMode="discrete" dur="{duration:.6f}s" repeatCount="indefinite"/>
+      <animate attributeName="y" values="{cursor_y}" keyTimes="{cursor_times}" calcMode="discrete" dur="{duration:.6f}s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0.65;0.65;0;0" keyTimes="0;{(fade_start - 2.4) / duration:.6f};{(fade_start - 2.2) / duration:.6f};1" dur="{duration:.6f}s" repeatCount="indefinite"/>
+    </rect>
+  </g>
 
-  <path id="carrier" d="{signal_path}" fill="none" stroke="url(#signal)" stroke-width="1.35" opacity="0.24" stroke-dasharray="4 8">
-    <animate attributeName="stroke-dashoffset" values="0;-96" dur="5.2s" repeatCount="indefinite"/>
-  </path>
-
-  {"".join(cells)}
-  {"".join(ripples)}
-
-  <circle r="5" fill="#f8fdff" filter="url(#glow)">
-    <animateMotion dur="{SIGNAL_DURATION}s" repeatCount="indefinite" path="{signal_path}"/>
-  </circle>
-  <circle r="2.2" fill="#fde68a">
-    <animateMotion dur="{SIGNAL_DURATION}s" begin="-2.8s" repeatCount="indefinite" path="{signal_path}"/>
-  </circle>
-
-  <g transform="translate(965 106)">
+  <g class="orbital-motion" transform="translate(965 106)">
     <circle cx="86" cy="52" r="49" fill="none" stroke="#19425d" stroke-width="1"/>
     <circle cx="86" cy="52" r="36" fill="none" stroke="#216286" stroke-width="1" stroke-dasharray="3 7">
       <animateTransform attributeName="transform" type="rotate" from="0 86 52" to="360 86 52" dur="18s" repeatCount="indefinite"/>
@@ -297,11 +305,11 @@ def render(username: str, today: date, activity: dict[date, tuple[int, int]]) ->
   </g>
 
   <path d="M54 245H1146" stroke="#19364b" stroke-width="1"/>
-  <text x="54" y="278" class="footer">Every contribution adds another node to the system.</text>
+  <text x="54" y="278" class="footer">One day at a time. More contributions, brighter cubes.</text>
   <text x="54" y="298" class="mono">{esc(start.isoformat())}  →  {esc(today.isoformat())}</text>
 
   <g transform="translate(821 270)">
-    <text x="0" y="10" class="mono">SIGNAL INTENSITY</text>
+    <text x="0" y="10" class="mono">LOW → HIGH COUNT</text>
     <rect x="128" y="0" width="11" height="11" rx="3" fill="{LEVEL_COLORS[0]}"/>
     <rect x="146" y="0" width="11" height="11" rx="3" fill="{LEVEL_COLORS[1]}"/>
     <rect x="164" y="0" width="11" height="11" rx="3" fill="{LEVEL_COLORS[2]}"/>
