@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import html
+import math
 import re
 import urllib.request
 from datetime import date, timedelta
@@ -100,21 +101,51 @@ def contribution_light(count: int, maximum: int) -> tuple[str, float]:
     return '#' + ''.join(f'{value:02x}' for value in rgb), 0.12 + 0.78 * strength
 
 
-def scan_timeline(days: list[tuple[date, int, int]]) -> tuple[list[float], float, float]:
-    """Visit every date chronologically, slowing down on contribution days."""
-    active = sum(count > 0 for _, count, _ in days)
-    dwell = min(0.55, 18.0 / max(active, 1))
-    elapsed = 0.35
-    arrivals = []
-    for _, count, _ in days:
-        arrivals.append(elapsed)
-        elapsed += dwell if count else 0.014
-    fade_start = elapsed + 2.4  # Hold the completed constellation before resetting.
-    return arrivals, fade_start, fade_start + 0.8
+def star_journey(days: list[tuple[date, int, int]]) -> dict:
+    """Smooth, eased curves between contribution days; empty cells are not stops."""
+    active = [(i, day) for i, (day, count, _) in enumerate(days) if count > 0]
+    if not active:
+        return dict(arrivals={}, duration=4.0, fade_start=3.2, path='', times=[], points=[])
+    targets = [(GRID_X + (i // DAYS) * (CELL + GAP) + CELL / 2,
+                GRID_Y + (i % DAYS) * (CELL + GAP) + CELL / 2) for i, _ in active]
+    previous = (max(30, targets[0][0] - 30), targets[0][1] + 14)
+    path = f'M{previous[0]:.3f},{previous[1]:.3f}'
+    elapsed, distance = .35, 0.0
+    times, distances = [0.0, elapsed], [0.0, 0.0]
+    arrivals = {}
+    for (_, day), target in zip(active, targets):
+        x0, y0 = previous
+        x1, y1 = target
+        dx = x1 - x0
+        c1, c2 = (x0 + dx * .45, y0), (x1 - dx * .45, y1)
+        path += f' C{c1[0]:.3f},{c1[1]:.3f} {c2[0]:.3f},{c2[1]:.3f} {x1:.3f},{y1:.3f}'
+        # Arc length supplies SMIL keyPoints so illumination matches arrival.
+        length, last = 0.0, previous
+        for step in range(1, 81):
+            t = step / 80
+            u = 1 - t
+            point = tuple(u**3 * previous[k] + 3*u*u*t*c1[k] +
+                          3*u*t*t*c2[k] + t**3*target[k] for k in (0, 1))
+            length += math.dist(last, point)
+            last = point
+        distance += length
+        elapsed += max(.85, min(2.8, .65 + length / 100))
+        arrivals[day] = elapsed
+        times.append(elapsed)
+        distances.append(distance)
+        elapsed += .28  # A brief, calm pause as the cube lights up.
+        times.append(elapsed)
+        distances.append(distance)
+        previous = target
+    fade_start = elapsed + 2.4
+    duration = fade_start + .8
+    times.append(duration)
+    distances.append(distance)
+    return dict(arrivals=arrivals, duration=duration, fade_start=fade_start, path=path,
+                times=[t / duration for t in times], points=[d / distance for d in distances])
 
 
-def render(username: str, today: date, activity: dict[date, tuple[int, int]],
-           *, explicit_motion: bool = False) -> str:
+def render(username: str, today: date, activity: dict[date, tuple[int, int]]) -> str:
     sunday_offset = (today.weekday() + 1) % 7
     current_week = today - timedelta(days=sunday_offset)
     start = current_week - timedelta(weeks=WEEKS - 1)
@@ -139,10 +170,10 @@ def render(username: str, today: date, activity: dict[date, tuple[int, int]],
             last_month = probe.month
 
     maximum = max((count for _, count, _ in days), default=0)
-    arrivals, fade_start, duration = scan_timeline(days)
+    journey = star_journey(days)
+    arrivals, fade_start, duration = journey['arrivals'], journey['fade_start'], journey['duration']
     dark = LEVEL_COLORS[0]
     cells: list[str] = []
-    static_cells: list[str] = []
     halos: list[str] = []
     for column in range(WEEKS):
         for row in range(DAYS):
@@ -154,9 +185,9 @@ def render(username: str, today: date, activity: dict[date, tuple[int, int]],
             label = f"{count} contribution{'s' if count != 1 else ''} on {day.isoformat()}"
             animation = ""
             if count:
-                arrival = arrivals[column * DAYS + row]
+                arrival = arrivals[day]
                 times = ';'.join(f'{t / duration:.6f}' for t in
-                                 (0, arrival, arrival + 0.04, fade_start, duration))
+                                 (0, arrival, arrival + 0.16, fade_start, duration))
                 animation = (
                     f'<animate attributeName="fill" values="{dark};{dark};{color};{color};{dark}" '
                     f'keyTimes="{times}" dur="{duration:.6f}s" repeatCount="indefinite"/>'
@@ -172,17 +203,22 @@ def render(username: str, today: date, activity: dict[date, tuple[int, int]],
                 f'<rect data-date="{day}" data-count="{count}" x="{x}" y="{y}" '
                 f'width="{CELL}" height="{CELL}" rx="2" fill="{dark}">{animation}</rect></g>'
             )
-            static_cells.append(
-                f'<rect x="{x}" y="{y}" width="{CELL}" height="{CELL}" rx="2" fill="{color}"/>'
-            )
-
-    # One subtle outline visits individual cells, not weekly column averages.
-    positions = [(GRID_X + (i // DAYS) * (CELL + GAP) - 2,
-                  GRID_Y + (i % DAYS) * (CELL + GAP) - 2) for i in range(len(days))]
-    cursor_times = ';'.join(f'{t / duration:.6f}' for t in [0, *arrivals, duration])
-    cursor_positions = [positions[0], *positions, positions[-1]]
-    cursor_x = ';'.join(str(x) for x, _ in cursor_positions)
-    cursor_y = ';'.join(str(y) for _, y in cursor_positions)
+    star = ''
+    if arrivals:
+        key_times = ';'.join(f'{t:.8f}' for t in journey['times'])
+        key_points = ';'.join(f'{p:.8f}' for p in journey['points'])
+        splines = ';'.join('0.4 0 0.2 1' for _ in range(len(journey['times']) - 1))
+        last_arrival = max(arrivals.values())
+        opacity_times = ';'.join(f'{t/duration:.8f}' for t in
+                                 (0, .25, last_arrival + .28, last_arrival + .8, duration))
+        star = f'''<g id="travelling-star" opacity="0">
+          <animateMotion path="{journey['path']}" calcMode="spline" keyTimes="{key_times}"
+            keyPoints="{key_points}" keySplines="{splines}" dur="{duration:.6f}s" repeatCount="indefinite"/>
+          <animate attributeName="opacity" values="0;1;1;0;0" keyTimes="{opacity_times}" dur="{duration:.6f}s" repeatCount="indefinite"/>
+          <circle r="7" fill="#67e8f9" opacity=".65" filter="url(#glow)"/>
+          <path d="M0 -5.5 L1.4 -1.4 L5.5 0 L1.4 1.4 L0 5.5 L-1.4 1.4 L-5.5 0 L-1.4 -1.4Z" fill="#eafdff"/>
+          <circle r="1.5" fill="#ffffff"/>
+        </g>'''
 
     labels = "".join(
         f'<text x="{GRID_X + column * (CELL + GAP)}" y="{GRID_Y - 17}" class="month">{label}</text>'
@@ -196,15 +232,8 @@ def render(username: str, today: date, activity: dict[date, tuple[int, int]],
     description = (
         f"Animated public contribution calendar for {username}: {total} contributions, "
         f"{active_days} active days, longest streak {longest} days. "
-        "Days are visited in chronological order; only contribution days light up. "
+        "A small shining star glides between contribution days in chronological order, lighting each on arrival. "
         "More contributions produce brighter cubes. The completed grid holds, then resets."
-    )
-    # Only the separate, explicitly opened player overrides reduced motion.
-    # The profile's normal SVG always retains its system-preference fallback.
-    play_style = (
-        '.static-grid { display:none; } '
-        '.animated-grid, .orbital-motion { display:inline; }'
-        if explicit_motion else ''
     )
 
     return f"""<svg xmlns="http://www.w3.org/2000/svg" width="{WIDTH}" height="{HEIGHT}" viewBox="0 0 {WIDTH} {HEIGHT}" role="img" aria-labelledby="title desc">
@@ -250,12 +279,6 @@ def render(username: str, today: date, activity: dict[date, tuple[int, int]],
       .metric-label {{ fill:#6f91a7; font-size:9px; font-weight:600; letter-spacing:1.1px; }}
       .footer {{ fill:#9bb7c8; font-size:12px; }}
       .mono {{ fill:#5b7f97; font-family: Consolas, monospace; font-size:9px; letter-spacing:1px; }}
-      .static-grid {{ display:none; }}
-      @media (prefers-reduced-motion: reduce) {{
-        .animated-grid, .orbital-motion {{ display:none; }}
-        .static-grid {{ display:inline; }}
-      }}
-      {play_style}
     </style>
   </defs>
 
@@ -283,16 +306,10 @@ def render(username: str, today: date, activity: dict[date, tuple[int, int]],
   </g>
 
   {labels}
-  <g class="static-grid">{"".join(static_cells)}</g>
   <g class="animated-grid">
     {"".join(halos)}
     {"".join(cells)}
-    <rect id="day-cursor" x="{positions[0][0]}" y="{positions[0][1]}" width="{CELL + 4}" height="{CELL + 4}"
-          rx="3" fill="none" stroke="#68899e" stroke-width="0.8" opacity="0.65">
-      <animate attributeName="x" values="{cursor_x}" keyTimes="{cursor_times}" calcMode="discrete" dur="{duration:.6f}s" repeatCount="indefinite"/>
-      <animate attributeName="y" values="{cursor_y}" keyTimes="{cursor_times}" calcMode="discrete" dur="{duration:.6f}s" repeatCount="indefinite"/>
-      <animate attributeName="opacity" values="0.65;0.65;0;0" keyTimes="0;{(fade_start - 2.4) / duration:.6f};{(fade_start - 2.2) / duration:.6f};1" dur="{duration:.6f}s" repeatCount="indefinite"/>
-    </rect>
+    {star}
   </g>
 
   <g class="orbital-motion" transform="translate(965 106)">
@@ -314,7 +331,7 @@ def render(username: str, today: date, activity: dict[date, tuple[int, int]],
   </g>
 
   <path d="M54 245H1146" stroke="#19364b" stroke-width="1"/>
-  <text x="54" y="278" class="footer">One day at a time. More contributions, brighter cubes.</text>
+  <text x="54" y="278" class="footer">Follow the star. More contributions, brighter cubes.</text>
   <text x="54" y="298" class="mono">{esc(start.isoformat())}  →  {esc(today.isoformat())}</text>
 
   <g transform="translate(821 270)">
@@ -329,32 +346,11 @@ def render(username: str, today: date, activity: dict[date, tuple[int, int]],
 """
 
 
-def player_markdown(username: str) -> str:
-    """A GitHub-rendered opt-in player, not an account preference change."""
-    return f'''# Activity constellation · Play animation
-
-You opened the animated view. Motion runs on this page even when your browser
-requests reduced motion; your browser and Windows settings are unchanged.
-
-**[■ Stop and return to profile](https://github.com/{username})**
-
-![Contribution days light up in order; more contributions create brighter cubes](https://raw.githubusercontent.com/{username}/{username}/activity-output/activity-constellation-play.svg)
-
-The outline visits dates in order, pausing on contribution days. Empty days stay
-dark. Lit cubes hold their brightness until the full grid fades and repeats.
-If you arrive during the hold, wait a few seconds for the next scan.
-
-Public contribution data · Refreshed with the profile's weekly visual update.
-'''
-
-
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--user", required=True)
     parser.add_argument("--output", required=True, type=Path)
     parser.add_argument("--date", type=date.fromisoformat, default=date.today())
-    parser.add_argument("--player-dir", type=Path,
-                        help="Also write an explicitly opted-in SVG and PLAY.md into this directory")
     args = parser.parse_args()
 
     sunday_offset = (args.date.weekday() + 1) % 7
@@ -364,11 +360,6 @@ def main() -> None:
     svg = render(args.user, args.date, activity)
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(svg, encoding="utf-8", newline="\n")
-    if args.player_dir:
-        args.player_dir.mkdir(parents=True, exist_ok=True)
-        (args.player_dir / 'activity-constellation-play.svg').write_text(
-            render(args.user, args.date, activity, explicit_motion=True), encoding='utf-8', newline='\n')
-        (args.player_dir / 'PLAY.md').write_text(player_markdown(args.user), encoding='utf-8', newline='\n')
 
 
 if __name__ == "__main__":

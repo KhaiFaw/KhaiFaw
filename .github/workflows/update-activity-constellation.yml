@@ -35,7 +35,6 @@ jobs:
           python scripts/render_activity_constellation.py
           --user "${{ github.repository_owner }}"
           --output "$RUNNER_TEMP/activity-constellation.svg"
-          --player-dir "$RUNNER_TEMP/activity-player"
 
       - name: Publish the refreshed visual
         env:
@@ -44,13 +43,11 @@ jobs:
           git fetch origin activity-output
           git worktree add "$RUNNER_TEMP/activity-output" origin/activity-output
           cp "$RUNNER_TEMP/activity-constellation.svg" "$RUNNER_TEMP/activity-output/activity-constellation.svg"
-          cp "$RUNNER_TEMP/activity-player/activity-constellation-play.svg" "$RUNNER_TEMP/activity-output/activity-constellation-play.svg"
-          cp "$RUNNER_TEMP/activity-player/PLAY.md" "$RUNNER_TEMP/activity-output/PLAY.md"
           cd "$RUNNER_TEMP/activity-output"
           git switch -c activity-output --track origin/activity-output
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -- activity-constellation.svg activity-constellation-play.svg PLAY.md
+          git add -- activity-constellation.svg
           if git diff --cached --quiet; then
             echo "Activity visual is already current."
             exit 0
