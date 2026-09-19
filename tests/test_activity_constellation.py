@@ -71,6 +71,21 @@ class ActivityTests(unittest.TestCase):
         self.assertEqual(len(root.findall('.//s:rect[@data-date]/s:animate', NS)), 0)
         self.assertIn('prefers-reduced-motion', root.find('.//s:style', NS).text)
 
+    def test_explicit_player_overrides_motion_only_after_opt_in(self):
+        default_style = self.root.find('.//s:style', NS).text
+        player = ET.fromstring(module.render('KhaiFaw', self.today, self.activity, explicit_motion=True))
+        player_style = player.find('.//s:style', NS).text
+        override = '.animated-grid, .orbital-motion { display:inline; }'
+        self.assertNotIn(override, default_style)
+        self.assertGreater(player_style.index(override), player_style.index('prefers-reduced-motion'))
+        self.assertEqual(len(player.findall('.//s:rect[@data-date]', NS)), len(self.cells))
+
+    def test_player_has_explicit_motion_notice_and_stop_link(self):
+        page = module.player_markdown('KhaiFaw')
+        self.assertIn('Stop and return to profile](https://github.com/KhaiFaw)', page)
+        self.assertIn('even when your browser', page)
+        self.assertIn('activity-output/activity-constellation-play.svg', page)
+
 
 if __name__ == '__main__':
     unittest.main()

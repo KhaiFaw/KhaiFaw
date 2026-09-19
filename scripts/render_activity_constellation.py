@@ -113,7 +113,8 @@ def scan_timeline(days: list[tuple[date, int, int]]) -> tuple[list[float], float
     return arrivals, fade_start, fade_start + 0.8
 
 
-def render(username: str, today: date, activity: dict[date, tuple[int, int]]) -> str:
+def render(username: str, today: date, activity: dict[date, tuple[int, int]],
+           *, explicit_motion: bool = False) -> str:
     sunday_offset = (today.weekday() + 1) % 7
     current_week = today - timedelta(days=sunday_offset)
     start = current_week - timedelta(weeks=WEEKS - 1)
@@ -198,6 +199,13 @@ def render(username: str, today: date, activity: dict[date, tuple[int, int]]) ->
         "Days are visited in chronological order; only contribution days light up. "
         "More contributions produce brighter cubes. The completed grid holds, then resets."
     )
+    # Only the separate, explicitly opened player overrides reduced motion.
+    # The profile's normal SVG always retains its system-preference fallback.
+    play_style = (
+        '.static-grid { display:none; } '
+        '.animated-grid, .orbital-motion { display:inline; }'
+        if explicit_motion else ''
+    )
 
     return f"""<svg xmlns="http://www.w3.org/2000/svg" width="{WIDTH}" height="{HEIGHT}" viewBox="0 0 {WIDTH} {HEIGHT}" role="img" aria-labelledby="title desc">
   <title id="title">{esc(title)}</title>
@@ -247,6 +255,7 @@ def render(username: str, today: date, activity: dict[date, tuple[int, int]]) ->
         .animated-grid, .orbital-motion {{ display:none; }}
         .static-grid {{ display:inline; }}
       }}
+      {play_style}
     </style>
   </defs>
 
@@ -320,11 +329,32 @@ def render(username: str, today: date, activity: dict[date, tuple[int, int]]) ->
 """
 
 
+def player_markdown(username: str) -> str:
+    """A GitHub-rendered opt-in player, not an account preference change."""
+    return f'''# Activity constellation · Play animation
+
+You opened the animated view. Motion runs on this page even when your browser
+requests reduced motion; your browser and Windows settings are unchanged.
+
+**[■ Stop and return to profile](https://github.com/{username})**
+
+![Contribution days light up in order; more contributions create brighter cubes](https://raw.githubusercontent.com/{username}/{username}/activity-output/activity-constellation-play.svg)
+
+The outline visits dates in order, pausing on contribution days. Empty days stay
+dark. Lit cubes hold their brightness until the full grid fades and repeats.
+If you arrive during the hold, wait a few seconds for the next scan.
+
+Public contribution data · Refreshed with the profile's weekly visual update.
+'''
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--user", required=True)
     parser.add_argument("--output", required=True, type=Path)
     parser.add_argument("--date", type=date.fromisoformat, default=date.today())
+    parser.add_argument("--player-dir", type=Path,
+                        help="Also write an explicitly opted-in SVG and PLAY.md into this directory")
     args = parser.parse_args()
 
     sunday_offset = (args.date.weekday() + 1) % 7
@@ -334,6 +364,11 @@ def main() -> None:
     svg = render(args.user, args.date, activity)
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(svg, encoding="utf-8", newline="\n")
+    if args.player_dir:
+        args.player_dir.mkdir(parents=True, exist_ok=True)
+        (args.player_dir / 'activity-constellation-play.svg').write_text(
+            render(args.user, args.date, activity, explicit_motion=True), encoding='utf-8', newline='\n')
+        (args.player_dir / 'PLAY.md').write_text(player_markdown(args.user), encoding='utf-8', newline='\n')
 
 
 if __name__ == "__main__":
