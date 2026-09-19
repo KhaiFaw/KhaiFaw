@@ -1,8 +1,8 @@
 name: Refresh activity constellation
 
 on:
-  schedule:
-    - cron: "17 2 * * 0"
+  # The redesigned README uses static evidence-led visuals. Keep the generator
+  # available manually without producing unused weekly refresh commits.
   workflow_dispatch:
 
 permissions:
