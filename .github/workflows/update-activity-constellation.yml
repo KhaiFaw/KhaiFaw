@@ -27,6 +27,9 @@ jobs:
         with:
           python-version: "3.x"
 
+      - name: Test calendar sequencing and brightness
+        run: python -m unittest discover -s tests -v
+
       - name: Render public contribution activity
         run: >
           python scripts/render_activity_constellation.py
