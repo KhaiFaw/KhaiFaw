@@ -183,4 +183,8 @@ Open to **graduate and early-career opportunities** in embedded software, Edge A
   <img src="https://raw.githubusercontent.com/KhaiFaw/KhaiFaw/activity-output/activity-constellation.svg" width="100%" alt="Animated activity constellation based on KhaiFaw's public GitHub contributions, with travelling signals and illuminated contribution nodes">
 </p>
 
-<p align="center"><sub>Public contributions · Refreshed weekly · Each node represents a day of building.</sub></p>
+<p align="center">
+  <a href="https://github.com/KhaiFaw/KhaiFaw/blob/activity-output/PLAY.md"><strong>▶ Play animation</strong></a><br>
+  <sub>Opens the animated view, even with reduced motion enabled. No browser settings changed.</sub><br>
+  <sub>Public contributions · Refreshed weekly · Each node represents a day of building.</sub>
+</p>
