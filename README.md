@@ -53,7 +53,7 @@ My **final-year acoustic detection project** is the starting point. The projects
 |:---:|:---:|:---:|:---:|
 | **6** | **39 × 61** | **114.39 KiB** · INT8 | **14 / 16** windows |
 
-<sub>Embedded prototype. The small historical split demonstrates feasibility, not broad reliability. A model-quantization correction is under <a href="https://github.com/KhaiFaw/ai-acoustic-event-detection/pull/1">draft review</a> and still needs board validation.</sub>
+<sub>Embedded prototype. The small historical split demonstrates feasibility, not broad reliability. The <a href="https://github.com/KhaiFaw/ai-acoustic-event-detection/pull/1">model-quantization correction is merged</a>: 16 host tests and a fresh local firmware build pass. <a href="https://github.com/KhaiFaw/ai-acoustic-event-detection/blob/main/docs/software-validation.md">Software verification</a> is documented; the corrected revision has not been tested on the board.</sub>
 
 <br><br>
 
@@ -72,16 +72,16 @@ My **final-year acoustic detection project** is the starting point. The projects
       <p>Preserves runs in SQLite and JSON, Markdown and HTML reports. Compatible baselines support regression comparisons; a labelled fault-injection demo exercises the failure path.</p>
       <p><code>Python</code> <code>C++20</code> <code>pytest</code> <code>SQLite</code></p>
       <p><a href="https://github.com/KhaiFaw/pc-platform-validation-toolkit"><strong>Inspect the toolkit →</strong></a><br>
-      <a href="https://github.com/KhaiFaw/pc-platform-validation-toolkit/blob/main/docs/final-verification.md">Verification scope</a> · <a href="https://github.com/KhaiFaw/pc-platform-validation-toolkit/blob/main/examples/measured/report.md">Measured report</a> · <a href="https://github.com/KhaiFaw/pc-platform-validation-toolkit/blob/main/examples/injected/report.md">Failure demo</a></p>
+      <a href="https://github.com/KhaiFaw/pc-platform-validation-toolkit/blob/main/docs/final-verification.md">Verification scope</a> · <a href="https://github.com/KhaiFaw/pc-platform-validation-toolkit/blob/main/examples/independent-sessions/README.md">Paired runs</a> · <a href="https://github.com/KhaiFaw/pc-platform-validation-toolkit/blob/main/examples/injected/report.md">Failure demo</a></p>
     </td>
   </tr>
 </table>
 
-| Automated tests | CI platforms | Captured run | Development stage |
+| Automated tests | CI platforms | Latest paired runs | Development stage |
 |:---:|:---:|:---:|:---:|
-| **66** | **Windows + Ubuntu** | **7 PASS · 1 WARN · 1 SKIP** | **0.1.0.dev0** |
+| **80** | **Windows + Ubuntu** | **8 PASS · 1 WARN each** | **0.1.0.dev0** |
 
-<sub>Missing native or sensor capabilities are reported explicitly. Captured results describe one local run, not hardware certification or a benchmark ranking.</sub>
+<sub>The native CPU probe is locally built and validated; temperature telemetry remains unavailable. Two separate quick runs preserve real timing variation and comparison threshold crossings. These are functional captures, not hardware certification or a benchmark ranking.</sub>
 
 <br><br>
 
